@@ -2,18 +2,15 @@ from __future__ import annotations
 import typing as t
 
 from copy import deepcopy
-from product_parser.url_parser import UrlParser
+from pparser.url_parser import UrlParser
 
 from bs4 import BeautifulSoup
 import asyncio
 from pyppeteer import launch
 from pyppeteer.browser import Browser
 
-import requests
-import requests_html
-
 from urllib.parse import ParseResult, urlparse, parse_qsl, urlencode, urlunparse
-from product_parser.product import Product
+from pparser.product import Product
 
 
 async def launch_browser():
@@ -30,7 +27,7 @@ async def launch_browser():
     ],)
 
 
-class ProductParser(UrlParser):
+class PParser(UrlParser):
 
     def __init__(self, url: str, verify: bool = True, visible: bool = False):
         super().__init__(url)
