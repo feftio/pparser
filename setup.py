@@ -15,6 +15,10 @@ setup(
     long_description_content_type='text/markdown',
     url='https://github.com/feftio/pparser',
     packages=find_packages(),
+    install_requires=[
+        'bs4',
+        'pyppeteer'
+    ],
     classifiers=[
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.6',
@@ -28,7 +32,6 @@ setup(
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'License :: OSI Approved :: MIT License',
-        'Operating System :: OS Independent',
-         
+        'Operating System :: OS Independent'
     ],
 )
