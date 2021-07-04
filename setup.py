@@ -17,7 +17,8 @@ setup(
     packages=find_packages(),
     install_requires=[
         'bs4',
-        'pyppeteer'
+        'pyppeteer',
+        'autopep8'
     ],
     classifiers=[
         'Programming Language :: Python :: 2',
