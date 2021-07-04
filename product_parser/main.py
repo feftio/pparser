@@ -2,7 +2,7 @@ from __future__ import annotations
 import typing as t
 
 from copy import deepcopy
-from url_parser import UrlParser
+from product_parser.url_parser import UrlParser
 
 from bs4 import BeautifulSoup
 import asyncio
@@ -13,7 +13,7 @@ import requests
 import requests_html
 
 from urllib.parse import ParseResult, urlparse, parse_qsl, urlencode, urlunparse
-from product import Product
+from product_parser.product import Product
 
 
 async def launch_browser():
