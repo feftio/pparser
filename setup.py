@@ -13,7 +13,7 @@ setup(
     description='Package for parsing websites with production',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url='https://github.com/feftio/product-parser',
+    url='https://github.com/feftio/pparser',
     packages=find_packages(),
     classifiers=[
         'Programming Language :: Python :: 2',
