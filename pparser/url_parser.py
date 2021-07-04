@@ -5,23 +5,23 @@ from urllib.parse import urlparse, urlunparse, ParseResult
 
 class UrlParser:
     def __init__(self, url: str):
-        self._url: ParseResult = urlparse(url)
+        self._parse_result: ParseResult = urlparse(url)
 
     @property
     def full_url(self) -> str:
-        return self._url.geturl()
+        return self._parse_result.geturl()
 
     @property
     def root_url(self) -> str:
-        return urlunparse((self._url.scheme, self._url.netloc, *([''] * 4)))
+        return urlunparse((self._parse_result.scheme, self._parse_result.netloc, *([''] * 4)))
 
     @property
     def url(self) -> str:
-        return urlunparse((self._url.scheme, self._url.netloc, self._url.path, *([''] * 3)))
+        return urlunparse((self._parse_result.scheme, self._parse_result.netloc, self._parse_result.path, *([''] * 3)))
 
     @property
     def query(self) -> str:
-        return self._url.query
+        return self._parse_result.query
 
-    def copywith(self, **params):
-        return UrlParser(self._url._replace(**params).geturl())
+    def copywith(self, **params: t.Dict[str, t.Any]):
+        return UrlParser(self._parse_result._replace(**params).geturl())
