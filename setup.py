@@ -6,7 +6,7 @@ with open("README.md", "r") as readme:
 
 
 setup(
-    name='product-parser',
+    name='pparser',
     version='0.1',
     author="Lik Eduard",
     author_email='feft99@gmail.com',
