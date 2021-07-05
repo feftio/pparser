@@ -1,6 +1,9 @@
 from __future__ import annotations
 import typing as t
 from urllib.parse import parse_qsl, urlencode
+from collections import defaultdict
+import asyncio
+
 
 def stringify_query(query: t.Union[str, t.Dict[str, t.Any]]) -> str:
     if isinstance(query, dict):
@@ -8,7 +11,8 @@ def stringify_query(query: t.Union[str, t.Dict[str, t.Any]]) -> str:
     elif isinstance(query, str):
         return query
     else:
-        raise TypeError(f'Argument by {query.__class__} must be instance of "str" or "dict".')
+        raise TypeError(
+            f'Argument by {query.__class__} must be instance of "str" or "dict".')
 
 
 def merge_queries(queryb: t.Union[str, t.Dict[str, t.Any]], querys: t.Union[str, t.Dict[str, t.Any]]) -> str:
@@ -16,5 +20,19 @@ def merge_queries(queryb: t.Union[str, t.Dict[str, t.Any]], querys: t.Union[str,
     return urlencode({**dict(parse_qsl(queryb)), **dict(parse_qsl(querys))})
 
 
-if __name__ == '__main__':
-    assert merge_queries('a=1&b=2&c=3', {'c': 4, 'd': '5'}) == 'a=1&b=2&c=4&d=5'
+def merge_settings(*settings: t.Dict[t.Any, t.Any]) -> t.Dict[t.Any, t.Aby]:
+    settings = list(settings)
+    sc = defaultdict(lambda *args: args, settings.pop(0))
+    for _ in range(len(settings)):
+        sn = settings.pop(0)
+        for k, v in sn.items():
+            if isinstance(sc[k], list):
+                sc[k].extend(v)
+                sc[k] = list(set(sc[k]))
+            else:
+                sc[k] = v
+    return dict(sc)
+
+
+def run_async(awaitable):
+    return asyncio.get_event_loop().run_until_complete(awaitable)
