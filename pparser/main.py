@@ -1,61 +1,24 @@
 from __future__ import annotations
+from pparser.pbrowser import PBrowser
 import typing as t
-
-from pyppeteer import browser
-
-from pparser.url_parser import UrlParser
+import asyncio
 
 from bs4 import BeautifulSoup
-import asyncio
 from pyppeteer import launch
 from pyppeteer.browser import Browser
 
-from urllib.parse import ParseResult, urlparse, parse_qsl, urlencode, urlunparse
 from pparser.product import Product
-
 from pparser.utils import merge_queries
+from pparser.url_parser import UrlParser
 
-LAUNCH_ARGS = (
-    '--disable-gpu',
-    '--disable-dev-shm-usage',
-    '--disable-setuid-sandbox',
-    '--no-first-run',
-    '--no-sandbox',
-    '--no-zygote',
-    '--deterministic-fetch',
-    '--disable-features=IsolateOrigins',
-    '--disable-site-isolation-trials',
-)
-
-DEFAULT_HEADERS = {}
-
-
-def run_async(awaitable):
-    return asyncio.get_event_loop().run_until_complete(awaitable)
+from pparser.utils import run_async
 
 
 class PParser:
 
-    def __init__(self, url: str, verify: bool = True, visible: bool = False, width: int = 1920, height: int = 1080):
+    def __init__(self, url: str, **settings):
         self._url_parser = UrlParser(url)
-        self.width = width
-        self.height = height
-        self.browser: Browser = run_async(
-            launch(headless=not(visible), ignoreHTTPSErrors=not(verify), args=(
-                *LAUNCH_ARGS, f'--window-size={self.width},{self.height}')))
-
-    async def get_content(self, url: str, waitable_selector: t.Optional[str] = None, timeout: int = 4000, sleep: float = 0.2):
-        page = await self.browser.newPage()
-        await page.setViewport({
-            'width': self.width,
-            'height': self.height,
-        })
-        await page.goto(url, options={'timeout': int(timeout)})
-        if waitable_selector is not None:
-            await page.waitForSelector(waitable_selector)
-        await asyncio.sleep(sleep)
-        await page.screenshot({'path': 'screenshot.png'})
-        return await page.content()
+        self._modern_broser = PBrowser(**settings)
 
     def get_products(self, query: t.Dict[str, t.Any] = {}, selector: str = '', timeout: int = 4000, sleep: float = 0.2) -> t.List[Product]:
         _url_parser = self._url_parser.copywith(
