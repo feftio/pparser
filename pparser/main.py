@@ -1,14 +1,10 @@
 from __future__ import annotations
-
-from bs4.element import ResultSet
-from pparser.pbrowser import PBrowser
 import typing as t
 
 from bs4 import BeautifulSoup
-from pyppeteer import launch
-from pyppeteer.browser import Browser
+from bs4.element import ResultSet
 
-from pparser.product import Product
+from pparser.pbrowser import PBrowser
 from pparser.utils import merge_queries
 from pparser.url_parser import UrlParser
 
