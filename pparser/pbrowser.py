@@ -36,17 +36,17 @@ class PBrowser:
             return page
         return run_async(wrapper())
 
-    def get_content(self, url: str, waitable_selector: t.Optional[str] = None, timeout: int = 15000, sleep: float = 0.2):
+    def get_content(self, url: str, **options):
         async def wrapper():
             page = await self.browser.newPage()
             await page.setViewport({
                 'width': self.options['width'],
                 'height': self.options['height'],
             })
-            await page.goto(url, options={'timeout': timeout})
-            if waitable_selector is not None:
-                await page.waitForSelector(waitable_selector, options={'timeout': timeout})
-            await asyncio.sleep(sleep)
+            await page.goto(url, options={'timeout': options.get('timeout', 15000)})
+            if options.get('waitable_selector', None) is not None:
+                await page.waitForSelector(options['waitable_selector'], options={'timeout': options.get('timeout', 15000)})
+            await asyncio.sleep(options.get('sleep', 0.2))
             # await page.screenshot({'path': 'screenshot.png'})
             return await page.content()
         return run_async(wrapper())

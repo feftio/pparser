@@ -1,4 +1,6 @@
 from __future__ import annotations
+
+from bs4.element import ResultSet
 from pparser.pbrowser import PBrowser
 import typing as t
 
@@ -17,15 +19,17 @@ class PParser:
         self._url_parser = UrlParser(url)
         self._pbrowser = PBrowser(**options)
 
-    def get_soups(self, query: t.Dict[str, t.Any] = {}, waitable_selector: t.Optional[str] = None, selector: str = '', timeout: int = 6000, sleep: float = 0.2) -> t.List[Product]:
+    def soup(self, **options) -> BeautifulSoup:
         _url_parser = self._url_parser.copywith(
-            query=merge_queries(self._url_parser.query, query))
-
+            query=merge_queries(self._url_parser.query, options.get('query', {})))
         soup = BeautifulSoup((self._pbrowser.get_content(
-            url=_url_parser.full_url, waitable_selector=waitable_selector, timeout=timeout, sleep=sleep)), 'html.parser')
-        soup_products = soup.select(selector)
+            url=_url_parser.full_url, **options)), 'html.parser')
+        return soup
 
-        return soup_products
+    def select(self, selector: str, **options) -> ResultSet:
+        soup = self.soup(**options)
+        soups = soup.select(selector)
+        return soups
 
         # for soup_product in soup_products:
         #     discount = soup_product.find('span', class_='price-sale active')
