@@ -20,11 +20,11 @@ def merge_queries(queryb: t.Union[str, t.Dict[str, t.Any]], querys: t.Union[str,
     return urlencode({**dict(parse_qsl(queryb)), **dict(parse_qsl(querys))})
 
 
-def merge_settings(*settings: t.Dict[t.Any, t.Any]) -> t.Dict[t.Any, t.Aby]:
-    settings = list(settings)
-    sc = defaultdict(lambda *args: args, settings.pop(0))
-    for _ in range(len(settings)):
-        sn = settings.pop(0)
+def merge_options(*options: t.Dict[t.Any, t.Any]) -> t.Dict[t.Any, t.Aby]:
+    options = list(options)
+    sc = defaultdict(lambda *args: args, options.pop(0))
+    for _ in range(len(options)):
+        sn = options.pop(0)
         for k, v in sn.items():
             if isinstance(sc[k], list):
                 sc[k].extend(v)
