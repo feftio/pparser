@@ -1,55 +1,57 @@
-from pparser.utils import merge_settings
 import typing as t
 import asyncio
 from pyppeteer.browser import Browser
 from pyppeteer.launcher import launch
-from pparser.utils import merge_settings, run_async
+from pparser.utils import merge_options, run_async
 
 
-DEFAULT_BROWSER_SETTINGS = {
-    'headless': True,
-    'ignoreHTTPSErrors': False,
-    'args': [
-
-    ]
-    # SIZE_TEMPLATE
-}
-
-
-def SIZE_TEMPLATE(width: int, height: int) -> t.Dict[t.Any, t.Any]:
+def DEFAULT_BROWSER_SETTINGS(**options) -> t.Dict[str, t.Any]:
     return {
+        'headless': True,
+        'ignoreHTTPSErrors': False,
         'args': [
-            f'--window-size={width},{height}'
+            '--window-size={},{}'.format(options.get('width', 1920),
+                                         options.get('height', 1080))
         ],
-        'width': width,
-        'height': height
+        'width': options.get('width', 1920),
+        'height': options.get('height', 1080)
     }
 
 
-def prepare_settings(settings: t.Dict[t.Any, t.Any], width: int, height: int):
-    return merge_settings(DEFAULT_BROWSER_SETTINGS, SIZE_TEMPLATE(width, height))
-
-
 class PBrowser:
-    def __init__(self, **settings):
-        self.settings: t.Dict[t.Any, t.Any] = merge_settings(
-            prepare_settings(DEFAULT_BROWSER_SETTINGS, settings.get('width', 1920), settings.get('height', 1080)), settings)
-        self.browser: Browser = run_async(launch(options=self.settings))
+    def __init__(self, **options):
+        self.options: t.Dict[t.Any, t.Any] = merge_options(
+            DEFAULT_BROWSER_SETTINGS(**options),
+            options)
+        self.browser: Browser = run_async(launch(options=self.options))
 
-    async def get_content(self, url: str, waitable_selector: t.Optional[str] = None, timeout: int = 4000, sleep: float = 0.2):
-        page = await self.browser.newPage()
-        await page.setViewport({
-            'width': self.settings['width'],
-            'height': self.settings['height'],
-        })
-        await page.goto(url, options={'timeout': timeout})
-        if waitable_selector is not None:
-            await page.waitForSelector(waitable_selector)
-        await asyncio.sleep(sleep)
-        await page.screenshot({'path': 'screenshot.png'})
-        return await page.content()
+    def __call__(self, url: str) -> None:
+        async def wrapper():
+            page = await self.browser.newPage()
+            await page.setViewport({
+                'width': self.options['width'],
+                'height': self.options['height'],
+            })
+            await page.goto(url)
+            return page
+        return run_async(wrapper())
+
+    def get_content(self, url: str, waitable_selector: t.Optional[str] = None, timeout: int = 15000, sleep: float = 0.2):
+        async def wrapper():
+            page = await self.browser.newPage()
+            await page.setViewport({
+                'width': self.options['width'],
+                'height': self.options['height'],
+            })
+            await page.goto(url, options={'timeout': timeout})
+            if waitable_selector is not None:
+                await page.waitForSelector(waitable_selector, options={'timeout': timeout})
+            await asyncio.sleep(sleep)
+            # await page.screenshot({'path': 'screenshot.png'})
+            return await page.content()
+        return run_async(wrapper())
 
 
 if __name__ == '__main__':
-    pbrowser = PBrowser(headless=False)
-    print(pbrowser.settings)
+    pbrowser = PBrowser()
+    pbrowser.get_content('https://www.google.com')
