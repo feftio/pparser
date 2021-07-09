@@ -2,27 +2,27 @@ import typing as t
 import asyncio
 from pyppeteer.browser import Browser
 from pyppeteer.launcher import launch
-from pparser.utils import merge_options, run_async
+from pparser.utils import merge_dicts, run_async
 
 
-def DEFAULT_BROWSER_SETTINGS(**options) -> t.Dict[str, t.Any]:
-    return {
+def DEFAULT_BROWSER_OPTIONS(**options) -> t.Dict[str, t.Any]:
+    DEFAULT_WIDTH = options.get('width', 1920)
+    DEFAULT_HEIGHT = options.get('height', 1080)
+    DEFAULT_DICT = {
         'headless': True,
         'ignoreHTTPSErrors': False,
         'args': [
-            '--window-size={},{}'.format(options.get('width', 1920),
-                                         options.get('height', 1080))
+            f'--window-size={DEFAULT_WIDTH},{DEFAULT_HEIGHT}'
         ],
-        'width': options.get('width', 1920),
-        'height': options.get('height', 1080)
+        'width': DEFAULT_WIDTH,
+        'height': DEFAULT_HEIGHT,
     }
+    return merge_dicts(DEFAULT_DICT, options, expandable=True)
 
 
 class PBrowser:
     def __init__(self, **options):
-        self.options: t.Dict[t.Any, t.Any] = merge_options(
-            DEFAULT_BROWSER_SETTINGS(**options),
-            options)
+        self.options: t.Dict[t.Any, t.Any] = DEFAULT_BROWSER_OPTIONS(**options)
         self.browser: Browser = run_async(launch(options=self.options))
 
     def __call__(self, url: str) -> None:
@@ -50,8 +50,3 @@ class PBrowser:
             # await page.screenshot({'path': 'screenshot.png'})
             return await page.content()
         return run_async(wrapper())
-
-
-if __name__ == '__main__':
-    pbrowser = PBrowser()
-    pbrowser.get_content('https://www.google.com')
