@@ -16,9 +16,9 @@ setup(
     url='https://github.com/feftio/pparser',
     packages=find_packages(),
     install_requires=[
-        'bs4',
-        'pyppeteer',
-        'autopep8'
+        'bs4==4.9.3',
+        'pyppeteer==0.2.5',
+        'autopep8==1.5.7'
     ],
     classifiers=[
         'Programming Language :: Python :: 2',
